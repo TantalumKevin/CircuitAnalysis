@@ -1,16 +1,16 @@
-import numpy, colorama, cv2, time
+import numpy, colorama, time, os
 from PIL import Image
 
 
 b = []
+path = __file__.replace("main.py","")
 para_name = ['Us','Z','Is','Id']
-im1 = Image.open(r'D:\\Projects\\Programs\\Python\\circuit-analysis\\circuit.jpg')
-im2 = Image.open(r'D:\\Projects\\Programs\\Python\\circuit-analysis\\branch.jpg')
+im1 = Image.open(path + 'circuit.jpg')
+im2 = Image.open(path + 'branch.jpg')
 colorama.init(autoreset=True)
 
 
-class branch():
-    """支路"""
+class branch(): #支路类定义
 
     para = []
 
@@ -84,6 +84,56 @@ class branch():
                                 temp.append(Z_temp)
                                 break
 
+def mag_ind():#是否有耦合电感
+
+    print('支路间是否含有耦合电感？')
+    print('1--没有\t 2--有')
+    while True:
+        cmd = input(">>>")
+        try:
+            cmd = int(cmd)
+            if cmd != 1 or cmd !=2:
+                raise ValueError
+        except ValueError :
+            print("请正确输入指令！")
+    if cmd - 1:
+        print("请输入耦合电感数量（单位：对）")
+        num = input(">>>")
+        L_list = []
+        for i in range(num):
+            print("请输入第i对耦合电感所在支路及互感系数：".replace('i',i))
+            print("输入示例：-2 -4 0.2")
+            print("前两个数字表示支路所在标号，第三个数字表示互感系数\033[0;30;47m(请注意用空格隔开三个数字）\033[0m\n负号表示同名端\033[0;30;47m非\033[0m电源流入端（电流参考方向请输入‘branch’查看）")
+            temp = []
+            in_str = ''
+            while True:
+                in_str = in_str + input(">>>")
+
+                if in_str == 'circuit':
+                    im1.show()
+                elif in_str == "branch":
+                    im2.show()
+                else:
+                    str_list = in_str.split(" ")
+
+                    if len(str_list) < 3:
+                        print('参数输入缺失，请继续输入！')
+                        continue
+                    elif len(str_list) > 3:
+                        print('参数输入溢出，请重新输入！')
+                        in_str = ''
+                        continue
+
+                    try:
+                        for j in range(2):
+                            temp.append(int(in_str[int(j)]))
+                        temp .append(float(in_str[int(2)]))
+                    except ValueError :
+                        print("请正确输入参数或获取帮助！")
+                    else:
+                        L_list.append(temp)
+                        break
+    return L_list
 
 print("请注意本程序\033[0;30;47m仅\033[0m可处理如图所示拓扑结构电路（支路编号、方向及结点编号已给出）")
 time.sleep(2)
@@ -92,3 +142,8 @@ im1.show()
 for i in range(1,7):
     #初始化支路类
     b.append(branch(i))
+
+ml = mag_ind()#检测是否有耦合电感
+
+#电路分析
+
