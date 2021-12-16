@@ -2,3 +2,5 @@ task.txt
 __pycache__
 README.html
 原理.jpg
+build
+dist
