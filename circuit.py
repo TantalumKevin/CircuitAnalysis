@@ -41,30 +41,30 @@ class branch(): #支路类定义
         for j in range(4):
             print(para_name[j] + str(index) + "=")
             if j <= 2:#阻抗+独立源
-                temp = []#a+bj
-                c_l = ['实', '虚' ]
-                for  k in range(2):
-                    while True:
-                        print('请输入' + para_name[j] + str(index) + '的' + c_l[int(k)] + '部')
-                        Z_temp = input(">>>")
-                        if Z_temp == 'circuit':
-                            im1.show()
-                        elif Z_temp == "branch":
-                            im2.show()
+            #a+bj
+                while True:
+                    print('请严格按照"1+2j"的形式输入' + para_name[j] + str(index))
+                    temp = input(">>>")
+                    if temp == 'circuit':
+                        im1.show()
+                    elif temp == "branch":
+                        im2.show()
+                    else:
+                        try:
+                            temp = complex(temp)
+                        except ValueError :
+                            print("请正确输入参数或获取帮助！")
                         else:
-                            try:
-                                Z_temp = float(Z_temp)
-                            except ValueError :
-                                print("请正确输入参数或获取帮助！")
-                            else:
-                                temp.append(Z_temp)
-                                break
-                print('\n' + para_name[j] + str(index) + " = " + str(temp[0]) + " + j" + str(temp[1]) + '\n')
+                            break
+                print('\n' + para_name[j] + str(index) + " = " + str(temp) + '\n')
 
             else:#受控源
                 temp = []
-                para_temp = ['类型\n0--不存在   1--VCCS   2--CCCS', '控制量所在支路（数字）', '控制量所在详细位置', '控制系数']
-                for k in range(4):
+                para_temp = ['类型\n0--不存在   1--VCCS   2--CCCS', '控制量所在支路（数字）', '控制系数']
+                if self.index == 1:
+                    im2.show()
+                print(self.focus("请注意，受控源控制量仅能来自于Uek或Iek(参考方向如图)",47))
+                for k in range(3):
                     try:
                         if temp[0] == 0:
                             print(temp[0])
@@ -76,13 +76,6 @@ class branch(): #支路类定义
                     else:
                         pass
                     print('请输入受控源Id'+ str(index) + '的' + para_temp[int(k)])
-                    if int(k) == 2:
-                        if temp[0] == 1:
-                            print('请注意按照支路定义图中给出的参考方向输入！！\n1--Uk\t2--Uek\t3--Usk'.replace('k',str(int(temp[1]))))
-                        else:
-                            print('请注意按照支路定义图中给出的参考方向输入！！\n1--Ik\t2--Iek\t3--Idk'.replace('k',str(int(temp[1]))))
-                        if self.index == 1:
-                            pass#im2.show()
                     while True:
                         Z_temp = input(">>>")
                         if Z_temp == 'circuit':
@@ -104,7 +97,7 @@ class branch(): #支路类定义
                                 break
             
                 if temp[0] != 0:
-                    output = '\nId' + str(self.index) + ' = ' + str(temp[3]) + ["Uk", 'Uek', 'Usk', "Ik", "Iek", "Idk"][int((temp[0] - 1) * 3 + temp[2] - 1)].replace('k', str(int(temp[1])) + '\n')
+                    output = '\nId' + str(self.index) + ' = ' + str(temp[2]) + ['Uek',"Iek"][int(temp[0] - 1)].replace('k', str(int(temp[1])) + '\n')
                     print(output)
             
             self.para.append(temp)
@@ -113,12 +106,12 @@ class branch(): #支路类定义
         print('\n')
         for j in range(4):
             if j <= 2:#阻抗+独立源
-                print(para_name[j] + str(self.index) + " = " + str(self.para[j][0]) + ' + j' + str(self.para[j][1]))
+                print(para_name[j] + str(self.index) + " = " + str(self.para[j]))
             else:
                 if len(self.para[j]) == 2:
                     print(para_name[j] + str(self.index) + " = 0")
                 else:
-                    output = 'Id' + str(self.index) + ' = ' + str(self.para[j][3]) + ["Uk", 'Uek', 'Usk', "Ik", "Iek", "Idk"][int((self.para[j][0] - 1) * 3 + self.para[j][2] - 1)].replace('k', str(int(self.para[j][1])) + '\n')
+                    output = 'Id' + str(self.index) + ' = ' + str(self.para[j][2]) + ['Uek',"Iek"][int(self.para[j][0] - 1)].replace('k', str(int(self.para[j][1])) + '\n')
                     print(output)
         print('\n')
 
@@ -138,6 +131,9 @@ def mag_ind():#是否有耦合电感
         else:
             break
     if cmd - 1:
+        print("请输入当前电路输入频率(单位：Hz)")
+        f = input(">>>")
+        w = float(f) / 2 / 3.1415926535
         print("请输入耦合电感数量（单位：对）")
         num = input(">>>")
         L_list = []
@@ -181,6 +177,6 @@ def mag_ind():#是否有耦合电感
                         L_list.append(temp)
                         break
         print(L_list)
-        return num, L_list
+        return int(num), w, L_list
     else:
-        return 0 , []
+        return 0, 0, []
